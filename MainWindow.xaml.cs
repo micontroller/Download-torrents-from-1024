@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,7 +25,7 @@ namespace grabDownlaodLinksFrom1024
             button_Copy_Click(null, null);
         }
         
-        //find torrent link in a page
+        //find all torrent links from a page
         bool hasLinks()
         {
             string link = getBetween(HTML, "<a href=\"http://www1.newstorrentsspace.info/freeone/file.php/", ".html");
@@ -40,7 +40,7 @@ namespace grabDownlaodLinksFrom1024
             }
         }
 
-        //download full html in a page
+        //download full html from a page
         string getHTML(string url, int substringIndex)
         {
             using (WebClient wc = new WebClient())
@@ -161,7 +161,7 @@ namespace grabDownlaodLinksFrom1024
             }
         }
 
-        //find topic on 1024 fourm
+        //find topics on 1024 fourm
         bool hasTopic()
         {
             var keyWordIndex = HTML.IndexOf(".html\">㊣無碼國產の精彩合集ⓑ");
