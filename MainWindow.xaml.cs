@@ -107,26 +107,6 @@ namespace grabDownlaodLinksFrom1024
             lblLastDownload.Content = dt.ToString("yyyy/MM/dd");
             lblLinksCount.Content = links.Count;
 
-            ////build links in html
-            //string goodies = "";
-            //foreach (var link in links)
-            //    goodies += "<a href=\"http://www1.newstorrentsspace.info/freeone/file.php/" + link + ".html\" target=\"_blank\">" + link + "</a><br />";
-
-            ////html save path(desktop)
-            //var htmlPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\goodies@" + DateTime.Now.ToString("MM.dd") + ".html";
-
-            ////save html
-            //if (links.Count != 0)
-            //{
-            //    File.WriteAllText(htmlPath, goodies);
-            //    MessageBox.Show("Html created:\r\n" + htmlPath);
-            //    this.Close();
-            //}
-            //else {
-            //    MessageBox.Show("no updates");
-            //    this.Close();
-            //}
-
             if (links.Count != 0)
             {
                 var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -165,6 +145,8 @@ namespace grabDownlaodLinksFrom1024
         bool hasTopic()
         {
             var keyWordIndex = HTML.IndexOf(".html\">㊣無碼國產の精彩合集ⓑ");
+            if(keyWordIndex==-1)
+                keyWordIndex = HTML.IndexOf(".html\">㊣最新國產の精品合集ⓐ");
             if (keyWordIndex != -1)
             {
                 var topic = HTML.Substring(keyWordIndex - 7, 7);
