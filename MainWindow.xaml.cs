@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Net;
 using System.IO;
+using System.Windows.Documents;
 
 namespace grabDownlaodLinksFrom1024
 {
@@ -22,17 +23,17 @@ namespace grabDownlaodLinksFrom1024
             InitializeComponent();
             lastDownloadDate = File.ReadLines("./lastDownloadDate.txt").First();
             lblLastDownload.Content = lastDownloadDate;
-            button_Copy_Click(null, null);
+            //button_Copy_Click(null, null);
         }
-        
+
         //find all torrent links from a page
         bool hasLinks()
         {
-            string link = getBetween(HTML, "<a href=\"http://www1.newstorrentsspace.info/freeone/file.php/", ".html");
+            string link = getBetween(HTML, "<a href=\"http://freess.jjyyfsdowns.net/freeone/file.php/", ".html");
             if (link != "")
             {
                 links.Add(link);
-                HTML = HTML.Replace("<a href=\"http://www1.newstorrentsspace.info/freeone/file.php/" + link + ".html", "");
+                HTML = HTML.Replace("<a href=\"http://freess.jjyyfsdowns.net/freeone/file.php/" + link + ".html", "");
                 return true;
             }
             else {
@@ -117,7 +118,7 @@ namespace grabDownlaodLinksFrom1024
                 {
                     foreach (var id in links)
                     {
-                        var Uri = "http://www1.newstorrentsspace.info/freeone/down.php?";
+                        var Uri = btLink.Text;
                         var parameters = Encoding.UTF8.GetBytes("type=torrent&id=" + id + "&name=" + id);
 
                         wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
@@ -126,35 +127,49 @@ namespace grabDownlaodLinksFrom1024
                         wc.Headers[HttpRequestHeader.Accept] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
                         wc.Headers[HttpRequestHeader.AcceptLanguage] = "zh-TW,zh;q=0.8,en-US;q=0.5,en;q=0.3";
                         wc.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
-                        wc.Headers[HttpRequestHeader.Referer] = "http://www1.newstorrentsspace.info/freeone/file.php/" + id + ".html";
+                        wc.Headers[HttpRequestHeader.Referer] = Uri + id + ".html";
 
                         byte[] result = wc.UploadData(Uri, "POST", parameters);
                         File.WriteAllBytes(path + "\\" + id + ".torrent", result);
                     }
                 }
                 MessageBox.Show("Torrents Downloaded:\r\n" + path);
-                this.Close();
+                //this.Close();
             }
             else {
                 MessageBox.Show("no updates");
-                this.Close();
+                //this.Close();
             }
         }
 
         //find topics on 1024 fourm
         bool hasTopic()
         {
-            var keyWordIndex = HTML.IndexOf(".html\">㊣無碼國產の精彩合集ⓑ");
-            if(keyWordIndex==-1)
-                keyWordIndex = HTML.IndexOf(".html\">㊣最新國產の精品合集ⓐ");
+            TextRange textRange = new TextRange(rtb.Document.ContentStart,rtb.Document.ContentEnd);
+            var keywords = textRange.Text.Replace("\r\n",",").Split(',');
+
+            int keyWordIndex = -1;
+            foreach (var keyword in keywords) {
+                if (keyWordIndex == -1)
+                {
+                    keyWordIndex = HTML.IndexOf(".html\">" + keyword);
+                    //Console.WriteLine(keyword+":"+keyWordIndex);
+                }
+            }
+                        
             if (keyWordIndex != -1)
             {
-                var topic = HTML.Substring(keyWordIndex - 7, 7);
-                topics.Add("http://opp.hegc1024.com/pw/simple/index.php?" + topic + ".html");
-                var date = Convert.ToDateTime("2016/" + HTML.Substring(keyWordIndex + 18, 6).Replace("[", "").Replace("]", "").Replace(".", "/"));
-                dates.Add(date);
-                HTML = HTML.Remove(keyWordIndex, 5);
-                return true;
+                try
+                {
+                    var topic = HTML.Substring(keyWordIndex - 7, 7);
+                    //Console.WriteLine("2016/" + HTML.Substring(keyWordIndex + 18, 7).Replace("[", "").Replace("]", "").Replace("<", "").Replace(">", "").Replace("a", "").Replace("/", "").Replace(".", "/"));
+                    var date = Convert.ToDateTime("2016/" + HTML.Substring(keyWordIndex + 18, 7).Replace("[", "").Replace("]", "").Replace("<", "").Replace(">", "").Replace("a", "").Replace("/", "").Replace(".", "/"));
+                    topics.Add("http://opp.hegc1024.com/pw/simple/index.php?" + topic + ".html");
+                    dates.Add(date);
+                    HTML = HTML.Remove(keyWordIndex, 5);
+                    return true;
+                }
+                catch { return false; }
             }
             else {
                 return false;
